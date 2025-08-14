@@ -20,31 +20,35 @@ class Configuration:
             for config_line in config_file:
                 self.__config_list.append(config_line)
 
+    @staticmethod
+    def config_module_template(module, config_file):
+        module_template = {
+            "address": r"\naddress\s+\S+\n.*?!",
+            "interface": r"\ninterface\s+\S+\n.*?!",
+            "service": r"\nservice\s+\S+\n.*?!",
+            "policy": r"\npolicy\s.*?(?:deny|permit)\s\d+.*?(?=create-by\s\S+.*?|\npolicy|\Z)",
+            "route": r"\nip\sroute.*?(?=[\n!])"
+        }
+        pattern = re.compile(module_template[module], re.DOTALL)
+        blocks = pattern.findall(config_file.read())
+        # for block in blocks:
+        #     print(block.strip())
+        return blocks
+
     # 查找相应区域的配置文件
     def search_module(self, module_name):
         with open(self.__config_file_path, 'r', encoding="utf-8") as config_file:
             match module_name:
                 case "address":
-                    address_pattern = re.compile(r"\naddress\s+\S+\n.*?!", re.DOTALL)
-                    address_blocks = address_pattern.findall(config_file.read())
-                    for block in address_blocks:
-                        print(block.strip())  # 去除前后空白字符
+                    blocks = self.config_module_template("address", config_file)
                 case "interface":
-                    interface_pattern = re.compile(r'\ninterface\s+\S+\n.*?!', re.DOTALL)
-                    interface_blocks = interface_pattern.findall(config_file.read())
-                    for block in interface_blocks:
-                        print(block.strip())
+                    blocks = self.config_module_template("interface", config_file)
                 case "service":
-                    service_pattern = re.compile(r"\nservice\s+\S+\n.*?!", re.DOTALL)
-                    service_blocks = service_pattern.findall(config_file.read())
-                    for block in service_blocks:
-                        print(block.strip())  # 去除前后空白字符
+                    blocks = self.config_module_template("service", config_file)
                 case "policy":
-                    policy_pattern = re.compile(r"\npolicy\s.*?(?:deny|permit)\s\d+.*?(?=create-by\s\S+.*?|\npolicy|\Z)", re.DOTALL)
-                    policy_blocks = policy_pattern.findall(config_file.read())
-                    print(policy_blocks)
-                    for block in policy_blocks:
-                        print(block.strip())
+                    blocks = self.config_module_template("policy", config_file)
+                case "route":
+                    blocks = self.config_module_template("route", config_file)
                 case _:
                     pass
             # print(config_file.read())
@@ -54,4 +58,4 @@ class Configuration:
 
 if __name__ == '__main__':
     config = Configuration("../input/startup-0.cfg")
-    config.search_module("policy")
+    config.search_module("interface")
