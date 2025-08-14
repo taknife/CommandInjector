@@ -25,17 +25,26 @@ class Configuration:
         with open(self.__config_file_path, 'r', encoding="utf-8") as config_file:
             match module_name:
                 case "address":
-                    address_pattern = re.compile(r"!address\s*(.*?)(?=\n!address-group|\n!service|\n!end)", re.DOTALL)
+                    address_pattern = re.compile(r"\naddress\s+\S+\n.*?!", re.DOTALL)
                     address_blocks = address_pattern.findall(config_file.read())
                     for block in address_blocks:
                         print(block.strip())  # 去除前后空白字符
-                    # print("address")
                 case "interface":
-                    pass
+                    interface_pattern = re.compile(r'\ninterface\s+\S+\n.*?!', re.DOTALL)
+                    interface_blocks = interface_pattern.findall(config_file.read())
+                    for block in interface_blocks:
+                        print(block.strip())
                 case "service":
-                    pass
+                    service_pattern = re.compile(r"\nservice\s+\S+\n.*?!", re.DOTALL)
+                    service_blocks = service_pattern.findall(config_file.read())
+                    for block in service_blocks:
+                        print(block.strip())  # 去除前后空白字符
                 case "policy":
-                    pass
+                    policy_pattern = re.compile(r"\npolicy\s.*?(?:deny|permit)\s\d+.*?(?=create-by\s\S+.*?|\npolicy|\Z)", re.DOTALL)
+                    policy_blocks = policy_pattern.findall(config_file.read())
+                    print(policy_blocks)
+                    for block in policy_blocks:
+                        print(block.strip())
                 case _:
                     pass
             # print(config_file.read())
@@ -44,5 +53,5 @@ class Configuration:
 
 
 if __name__ == '__main__':
-    config = Configuration("../input/startup.cfg")
-    config.search_module("address")
+    config = Configuration("../input/startup-0.cfg")
+    config.search_module("policy")
