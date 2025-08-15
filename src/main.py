@@ -4,3 +4,9 @@
 # @Author  : taknife
 # @Project : CommandInjector
 # @File    : main.py
+
+import configuration_clear
+import device_link
+
+if __name__ == '__main__':
+    pass
