@@ -60,13 +60,6 @@ class DeviceLink:
         """析构函数作为最后保障"""
         self._cleanup()
 
-    # def executive_command(self):
-    #     self.__shell.send(bytes("show version\n", "utf-8"))
-    #     time.sleep(0.2)
-    #     print(self.__shell.recv(1024).decode())
-    # def recognition_view(self):
-    #     prompt = self.__transport.
-
     def executive_command(self, command: str) -> str:
         """执行命令并返回完整输出"""
         if not self.__shell:
@@ -124,20 +117,9 @@ class DeviceLink:
 def main(ip, port, username, password, config_list):
     try:
         # 使用with语句确保资源释放
-        test_list = []
         with DeviceLink(ip, port, username, password) as link:
             link.executive_command("enable\n")
             link.executive_command("configure terminal\n")
-            # output = link.executive_command("enable\n")
-            # test_list.append(output)
-            # output1 = link.executive_command("configure terminal\n")
-            # test_list.append(output1)
-
-            # for i in test_list:
-            #     print(i)
-            #
-            # print("命令输出:", test_list)
-
             for config in config_list:
                 link.executive_command(config)
 
@@ -149,5 +131,3 @@ def main(ip, port, username, password, config_list):
     except Exception as e:
         print(f"其他错误: {e}")
 
-
-# main("192.168.211.101", 22, "admin", "admin.123")
