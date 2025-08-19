@@ -44,10 +44,3 @@ class Configuration:
                     return self.__config_module_template(module_name, config_file)
                 case _:
                     return None
-
-
-
-
-if __name__ == '__main__':
-    config = Configuration("../input/startup-0.cfg")
-    print(config.search_module("interface"))

@@ -4,6 +4,7 @@
 # @Author  : taknife
 # @Project : CommandInjector
 # @File    : device_link.py
+from threading import Thread
 
 import paramiko
 import time
@@ -86,9 +87,9 @@ class DeviceLink:
                     if self.__shell.recv_ready():
                         part = self.__shell.recv(4096).decode("utf-8", errors="ignore")
                         if part:
-                            print(part)
+                            # print(part)
                             command_output += part
-
+                            # print(command_output)
                             # 检查分页提示
                             if "--More--" in part:
                                 self.__shell.send(bytes(" ", "utf-8"))  # 发送空格继续
@@ -112,22 +113,3 @@ class DeviceLink:
 
         except Exception as e:
             raise RuntimeError(f"命令执行失败: {str(e)}")
-
-
-def main(ip, port, username, password, config_list):
-    try:
-        # 使用with语句确保资源释放
-        with DeviceLink(ip, port, username, password) as link:
-            link.executive_command("enable\n")
-            link.executive_command("configure terminal\n")
-            for config in config_list:
-                link.executive_command(config)
-
-            link.executive_command("\n")
-            link.executive_command("end\n")
-
-    except ConnectionError as e:
-        print(f"连接错误: {e}")
-    except Exception as e:
-        print(f"其他错误: {e}")
-
