@@ -55,8 +55,8 @@ class WorkerThread(QThread):
 class MainUI(QWidget):
     def __init__(self):
         super().__init__()
-        # self.ui = QUiLoader().load("../ui/main.ui")
-        self.ui = QUiLoader().load("./ui/main.ui")
+        self.ui = QUiLoader().load("../ui/main.ui")
+        # self.ui = QUiLoader().load("./ui/main.ui")
         self.ui.config_path_button.clicked.connect(partial(self.upload_file))
         self.ui.module_select.addItems(["address", "service", "policy", "interface", "route"])
         self.ui.submit_button.clicked.connect(partial(self.submit_config))
@@ -99,8 +99,8 @@ class MainUI(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon('./images/logo.png'))
-    # app.setWindowIcon(QIcon('../images/logo.png'))
+    # app.setWindowIcon(QIcon('./images/logo.png'))
+    app.setWindowIcon(QIcon('../images/logo.png'))
     stats = MainUI()
     stats.ui.show()
     sys.exit(app.exec_())
