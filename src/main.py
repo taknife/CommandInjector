@@ -5,14 +5,11 @@
 # @Project : CommandInjector
 # @File    : main.py
 import sys
-from threading import Thread
-
+import configuration_clear
+import device_link
 from PySide6 import QtGui
 from PySide6.QtCore import QStandardPaths, QObject, Signal, QThread
 from PySide6.QtGui import QIcon
-
-import configuration_clear
-import device_link
 from functools import partial
 from PySide6.QtWidgets import QApplication, QWidget, QFileDialog, QTextBrowser
 from PySide6.QtUiTools import QUiLoader
