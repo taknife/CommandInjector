@@ -6,9 +6,8 @@
 # @File    : local_config_manager.py
 
 import yaml
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class ConfigManager:
