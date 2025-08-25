@@ -69,7 +69,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="module_select"/>
+          <widget class="QComboBox" name="module_select">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
