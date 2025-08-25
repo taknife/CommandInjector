@@ -13,5 +13,9 @@ from PySide6.QtWidgets import QTextBrowser
 class ConsoleSignals(QObject):
     text_print = Signal(QTextBrowser,str)
 
+class CheckStatuSignals(QObject):
+    statu = Signal(bool)
+
 
 console_signals = ConsoleSignals()
+statu_signals = CheckStatuSignals()

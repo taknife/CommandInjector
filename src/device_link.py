@@ -4,8 +4,6 @@
 # @Author  : taknife
 # @Project : CommandInjector
 # @File    : device_link.py
-from threading import Thread
-
 import paramiko
 import time
 import socket
