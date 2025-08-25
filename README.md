@@ -12,7 +12,7 @@
 
 ### Windows平台安装部署
 
-* 直接下载发行版本[CommandInjector 发行版本](https://github.com/taknife/CommandInjector/releases/tag/Beta)
+* 直接下载发行版本[CommandInjector 发行版本](https://github.com/taknife/CommandInjector/releases)
 
 
 
