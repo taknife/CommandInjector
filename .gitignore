@@ -209,3 +209,5 @@ __marimo__/
 .idea/
 develop_log.txt
 test/
+backup/
+config/
