@@ -6,7 +6,9 @@
 # @File    : main.py
 
 import sys
-import configuration_clear
+import text_config_cleaning
+import configuration_cleaning
+from pathlib import Path
 from task_modules import *
 from functools import partial
 from PySide6.QtUiTools import QUiLoader
@@ -22,10 +24,12 @@ class MainUI(QWidget):
         self.ui = QUiLoader().load("../ui/main.ui")
         # self.ui = QUiLoader().load("./ui/main.ui")
         self.ui.config_path_button.clicked.connect(partial(self.upload_file))
+        self.ui.config_path.textChanged.connect(self.check_config_suffix)
         self.ui.module_select.addItems(["address", "service", "policy", "interface", "route"])
         self.ui.submit_button.clicked.connect(partial(self.submit_config))
         self.ui.clear_button.clicked.connect(partial(self.clear_text_button))
         self.ui.port.setValidator(QIntValidator())
+        self.ui.module_select.setEnabled(False)
         self.check_input_statu = None
         # 存储当前提交的数据，以便在信号处理中使用
         self.current_submit_data = {}
@@ -36,18 +40,18 @@ class MainUI(QWidget):
         self.current_port = 0
         self.current_username = ""
         self.current_password = ""
+        self.__suffix = ""
 
         # 信号连接槽函数
         console_signals.text_print.connect(self.update_console_log)
         statu_signals.statu.connect(self.on_input_check_complete)
-
-
 
     @staticmethod
     def update_console_log(browser: QTextBrowser, text: str):
         browser.append(text)  # 追加文本
         browser.ensureCursorVisible()  # 确保光标可见（自动滚动）
 
+    # 自检输入参数是否存在问题
     def on_input_check_complete(self, statu: bool):
         """输入检查完成后的回调函数"""
         if not statu:
@@ -58,9 +62,14 @@ class MainUI(QWidget):
         console_signals.text_print.emit(self.ui.console_log, f"正在连接：{self.current_ip}:{self.current_port}")
 
         try:
+            config_module = None
             # 开始对配置文件进行数据清洗
-            config = configuration_clear.Configuration(self.current_config_path)
-            config_module = config.search_module(self.current_module_name)
+            if self.__suffix == ".cfg":
+                config = configuration_cleaning.Configuration(self.current_config_path)
+                config_module = config.search_module(self.current_module_name)
+            elif self.__suffix == ".txt":
+                config = text_config_cleaning.TextConfig(self.current_config_path)
+                config_module = config.check_text_config()
 
             # 启动配置导入线程
             thread = ExecutiveCommandThread(
@@ -75,6 +84,31 @@ class MainUI(QWidget):
         except Exception as e:
             console_signals.text_print.emit(self.ui.console_log, f"配置处理错误: {str(e)}")
 
+    # 检查配置文件后缀名，如果为.cfg则开启模块选择窗口，如果为.txt则关闭模块选择窗口
+    def check_config_suffix(self):
+        """检查配置文件后缀名并设置模块选择窗口状态"""
+        config_path = self.ui.config_path.text()
+
+        if not config_path:
+            self.ui.module_select.setEnabled(False)
+            return
+
+        try:
+            # 使用pathlib获取后缀名
+            self.__suffix = Path(config_path).suffix.lower()
+
+            if self.__suffix == '.cfg':
+                self.ui.module_select.setEnabled(True)
+            elif self.__suffix == '.txt':
+                self.ui.module_select.setEnabled(False)
+            else:
+                self.ui.module_select.setEnabled(False)
+
+        except Exception as e:
+            console_signals.text_print.emit(self.ui.console_log, f"路径解析错误: {str(e)}")
+            self.ui.module_select.setEnabled(False)
+
+    # 文件上传方法
     def upload_file(self):
         desktop_path = QStandardPaths.writableLocation(QStandardPaths.DesktopLocation) or "C:\\"
         filepath, _ = QFileDialog.getOpenFileName(
@@ -85,6 +119,7 @@ class MainUI(QWidget):
         )
         self.ui.config_path.setText(filepath)
 
+    # 点击提交按钮后执行的方法
     def submit_config(self):
         """提交配置，启动输入验证"""
         self.current_module_name = self.ui.module_select.currentText()
@@ -112,6 +147,7 @@ class MainUI(QWidget):
         thread_0 = CheckInputDataThread(self.current_ip, self.current_config_path, self)
         thread_0.start()
 
+    # 清空打印框内的全部数据
     def clear_text_button(self):
         self.ui.console_log.clear()
 

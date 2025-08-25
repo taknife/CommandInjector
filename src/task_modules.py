@@ -11,6 +11,8 @@ import device_link
 from signal_modules import *
 from PySide6.QtCore import QThread
 
+
+# 下发命令线程类
 class ExecutiveCommandThread(QThread):
     def __init__(self, ip, port, username, password, config_module, parent=None):
         super().__init__(parent)
@@ -20,6 +22,7 @@ class ExecutiveCommandThread(QThread):
         self.password = password
         self.config_module = config_module
 
+    # 运行函数，线程自动调用
     def run(self):
         try:
             with device_link.DeviceLink(self.ip, self.port, self.username, self.password) as link:
@@ -36,12 +39,14 @@ class ExecutiveCommandThread(QThread):
             console_signals.text_print.emit(self.parent().ui.console_log, f"其他错误: {e}")
 
 
+# 自检输入参数线程类
 class CheckInputDataThread(QThread):
     def __init__(self, ip, config_path, parent=None):
         super().__init__(parent)
         self.ip = ip
         self.config_path = config_path
 
+    # 运行函数，线程自动调用
     def run(self):
         ip_statu = self.check_input_ip()
         path_statu = self.check_input_config_path()
@@ -50,6 +55,7 @@ class CheckInputDataThread(QThread):
         else:
             statu_signals.statu.emit(False)
 
+    # 检查配置路径方法
     def check_input_config_path(self):
         """
         验证配置路径的有效性
@@ -88,6 +94,7 @@ class CheckInputDataThread(QThread):
             console_signals.text_print.emit(self.parent().ui.console_log, error_msg)
             return False
 
+    # 检查IP地址格式方法
     def check_input_ip(self):
         if self.ip:
             ipv4_pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'

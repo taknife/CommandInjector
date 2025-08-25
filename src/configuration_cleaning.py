@@ -3,7 +3,7 @@
 # @Time    : 2025/8/12 14:21
 # @Author  : taknife
 # @Project : CommandInjector
-# @File    : configuration_clear.py
+# @File    : configuration_cleaning.py
 
 import re
 
