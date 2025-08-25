@@ -8,9 +8,9 @@
 import sys
 import text_config_cleaning
 import configuration_cleaning
-from pathlib import Path
 from task_modules import *
 from functools import partial
+from local_config_manager import *
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QStandardPaths
 from PySide6.QtGui import QIcon, QIntValidator
@@ -23,13 +23,22 @@ class MainUI(QWidget):
         # 动态调用UI
         self.ui = QUiLoader().load("../ui/main.ui")
         # self.ui = QUiLoader().load("./ui/main.ui")
+        self.check_config_suffix()
+        self.config_manager = ConfigManager("../config/sysconfig.yaml")
+        # self.config_manager = ConfigManager("./config/sysconfig.yaml")
         self.ui.config_path_button.clicked.connect(partial(self.upload_file))
+        self.ui.config_path.setText(self.config_manager.get('config_file.path'))
         self.ui.config_path.textChanged.connect(self.check_config_suffix)
+        self.ui.module_select.setEnabled(self.config_manager.get('config_file.statu'))
         self.ui.module_select.addItems(["address", "service", "policy", "interface", "route"])
         self.ui.submit_button.clicked.connect(partial(self.submit_config))
         self.ui.clear_button.clicked.connect(partial(self.clear_text_button))
+        self.ui.ip.setText(self.config_manager.get('network.default_ip'))
         self.ui.port.setValidator(QIntValidator())
-        self.ui.module_select.setEnabled(False)
+        self.ui.port.setText(self.config_manager.get('network.default_port'))
+        self.ui.username.setText(self.config_manager.get('authentication.username'))
+        self.ui.password.setText(self.config_manager.get('authentication.password'))
+        # self.ui.module_select.setEnabled(False)
         self.check_input_statu = None
         # 存储当前提交的数据，以便在信号处理中使用
         self.current_submit_data = {}
@@ -57,6 +66,14 @@ class MainUI(QWidget):
         if not statu:
             console_signals.text_print.emit(self.ui.console_log, "输入数据验证失败")
             return
+
+        # 将输入内容添加到配置文件
+        self.config_manager.set('config_file.path', self.ui.config_path.text())
+        self.config_manager.set('network.default_ip', self.ui.ip.text())
+        self.config_manager.set('network.default_port', self.ui.port.text())
+        self.config_manager.set('authentication.username', self.ui.username.text())
+        self.config_manager.set('authentication.password', self.ui.password.text())
+        self.config_manager.save()
 
         # 使用存储的类属性
         console_signals.text_print.emit(self.ui.console_log, f"正在连接：{self.current_ip}:{self.current_port}")
@@ -99,10 +116,13 @@ class MainUI(QWidget):
 
             if self.__suffix == '.cfg':
                 self.ui.module_select.setEnabled(True)
+                self.config_manager.set('config_file.statu', True)
             elif self.__suffix == '.txt':
                 self.ui.module_select.setEnabled(False)
+                self.config_manager.set('config_file.statu', False)
             else:
                 self.ui.module_select.setEnabled(False)
+                self.config_manager.set('config_file.statu', False)
 
         except Exception as e:
             console_signals.text_print.emit(self.ui.console_log, f"路径解析错误: {str(e)}")
@@ -154,8 +174,8 @@ class MainUI(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # app.setWindowIcon(QIcon('./images/logo.png'))
-    app.setWindowIcon(QIcon('../images/logo.png'))
+    # app.setWindowIcon(QIcon('./ui/images/logo.png'))
+    app.setWindowIcon(QIcon('../ui/images/logo.png'))
     stats = MainUI()
     stats.ui.show()
     sys.exit(app.exec())
