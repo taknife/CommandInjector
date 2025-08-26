@@ -38,8 +38,6 @@ class MainUI(QWidget):
         self.ui.port.setText(self.config_manager.get('network.default_port'))
         self.ui.username.setText(self.config_manager.get('authentication.username'))
         self.ui.password.setText(self.config_manager.get('authentication.password'))
-        # self.ui.module_select.setEnabled(False)
-        self.check_input_statu = None
         # 存储当前提交的数据，以便在信号处理中使用
         self.current_submit_data = {}
         # 初始化提交数据
@@ -50,7 +48,8 @@ class MainUI(QWidget):
         self.current_username = ""
         self.current_password = ""
         self.__suffix = ""
-
+        # 初始化配置参数
+        self.check_input_statu = None
         # 信号连接槽函数
         console_signals.text_print.connect(self.update_console_log)
         statu_signals.statu.connect(self.on_input_check_complete)
