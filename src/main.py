@@ -93,7 +93,8 @@ class MainUI(QWidget):
                 self.current_port,
                 self.current_username,
                 self.current_password,
-                config_module, self
+                config_module,
+                self
             )
             thread.start()
 
